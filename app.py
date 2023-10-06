@@ -15,7 +15,7 @@ if __name__ == "__main__":
     site_urls = os.environ.get("SITE_URLS", "").split(",")
     basic_auth_usernames = os.environ.get("BASIC_AUTH_USERNAMES", "").split(",")
     basic_auth_passwords = os.environ.get("BASIC_AUTH_PASSWORDS", "").split(",")
-    unaccessible_websites = [
+    inaccessible_websites = [
         (site_name, site_url)
         for site_name, site_url, basic_auth_username, basic_auth_password in zip(
             site_names, site_urls, basic_auth_usernames, basic_auth_passwords
@@ -23,8 +23,8 @@ if __name__ == "__main__":
         if not is_accessible(site_url, basic_auth_username, basic_auth_password)
     ]
 
-    if len(unaccessible_websites) > 0:
+    if len(inaccessible_websites) > 0:
         send_message(
             os.environ.get("SLACK_CHANNEL_ID", ""),
-            build_message(zip(site_names, site_urls), now),
+            build_message(inaccessible_websites, now),
         )
