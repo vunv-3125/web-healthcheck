@@ -1,3 +1,4 @@
+import logging
 from time import sleep
 
 
@@ -27,3 +28,21 @@ def is_executed_without_exception(func):
             return False
 
     return wrapper
+
+
+def setup_logging():
+    message_format = "%(asctime)s %(message)s"
+    date_format = "[%Y-%m-%d %H:%M:%S]"
+    logging.basicConfig(
+        filename="logs/info.log",
+        format=message_format,
+        datefmt=date_format,
+        level=logging.INFO,
+    )
+    logging.basicConfig(
+        filename="logs/error.log",
+        format=message_format,
+        datefmt=date_format,
+        level=logging.ERROR,
+    )
+    logging.getLogger("seleniumwire").setLevel(logging.ERROR)
