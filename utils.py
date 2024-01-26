@@ -34,25 +34,22 @@ def is_executed_without_exception(func):
 
 
 def setup_logging():
-    message_format = "%(asctime)s %(message)s"
-    date_format = "[%Y-%m-%d %H:%M:%S]"
-    logging.basicConfig(
-        filename="logs/info.log",
-        format=message_format,
-        datefmt=date_format,
-        level=logging.INFO,
-    )
-    logging.basicConfig(
-        filename="logs/error.log",
-        format=message_format,
-        datefmt=date_format,
-        level=logging.ERROR,
-    )
+    formatter = logging.Formatter("%(asctime)s:%(levelname)s %(message)s")
+    formatter.datefmt = "[%Y-%m-%d %H:%M:%S]"
+
+    app_logger = logging.getLogger("app")
+    app_logger.setLevel(logging.INFO)
+    file_handler = logging.FileHandler("logs/app.log")
+    file_handler.setFormatter(formatter)
+    app_logger.addHandler(file_handler)
 
     selenium_logger = logging.getLogger("seleniumwire")
+    selenium_logger.setLevel(logging.INFO)
     if selenium_logger.hasHandlers():
         selenium_logger.handlers.clear()
-    selenium_logger.addHandler(logging.FileHandler("logs/selenium_debug.log"))
+    file_handler = logging.FileHandler("logs/selenium.log")
+    file_handler.setFormatter(formatter)
+    selenium_logger.addHandler(file_handler)
 
 
 def generate_auth_header(username: str, password: str) -> str:

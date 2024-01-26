@@ -57,7 +57,7 @@ def is_accessible(
             if use_selenium
             else doRequest(url, basic_auth_username, basic_auth_password)
         )
-        logging.info(f"{url}: {response_code}")
+        logging.getLogger("app").info(f"{url}: {response_code}")
         if response_code // 100 == 2:
             return
         raise Exception()
