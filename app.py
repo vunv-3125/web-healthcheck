@@ -1,6 +1,8 @@
 from datetime import datetime
+import json
 import logging
 import os
+from typing import List
 from dotenv import load_dotenv
 import pytz
 from healthcheck import is_accessible
@@ -16,26 +18,20 @@ if __name__ == "__main__":
     timezone = pytz.timezone("Asia/Tokyo")
     now = datetime.now(timezone).strftime("%Y/%m/%d %H:%M %Z")
 
-    site_names = os.environ.get("SITE_NAMES", "").split(",")
-    site_urls = os.environ.get("SITE_URLS", "").split(",")
-    basic_auth_usernames = os.environ.get("BASIC_AUTH_USERNAMES", "").split(",")
-    basic_auth_passwords = os.environ.get("BASIC_AUTH_PASSWORDS", "").split(",")
+    with open("sites_data.json", "r") as sites_data_file:
+        sites_data: List[dict] = json.load(sites_data_file)
 
+    websites = (site_data.values() for site_data in sites_data)
     try:
-        websites = "\n".join(
-            [
-                f"{site_name}: {site_url}"
-                for site_name, site_url in zip(site_names, site_urls)
-            ]
-        )
-        logging.info(f"Websites list:\n {websites}")
-
         inaccessible_websites = [
-            (site_name, site_url)
-            for site_name, site_url, basic_auth_username, basic_auth_password in zip(
-                site_names, site_urls, basic_auth_usernames, basic_auth_passwords
+            (name, url, basic_auth_username, basic_auth_password, use_selenium)
+            for name, url, basic_auth_username, basic_auth_password, use_selenium in websites
+            if not is_accessible(
+                url,
+                basic_auth_username,
+                basic_auth_password,
+                use_selenium,
             )
-            if not is_accessible(site_url, basic_auth_username, basic_auth_password)
         ]
 
         if len(inaccessible_websites) > 0:
